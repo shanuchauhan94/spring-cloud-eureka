@@ -1,0 +1,52 @@
+server:
+  port: 8088
+
+spring:
+  application:
+    name: cloud-gateway
+  cloud:
+    gateway:
+      routes:
+        - id: order-server
+          uri: lb://order-service
+          predicates:
+            - Path=/order/**
+        - id: payment-server
+          uri: lb://payment-service
+          predicates:
+            - Path=/payment/**
+          filters:
+            - name: RequestSize
+              args:
+                MaxSize: 500000
+
+eureka:
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: http://localhost:9090/eureka/
+  instance:
+    hostname: 127.0.0.1
+
+# Actuator configuration
+management:
+  endpoints:
+    web:
+      exposure:
+        include:
+          - info
+          - health
+        exclude:
+          - loggers
+  info:
+    java:
+      enabled: true
+    os:
+      enabled: true
+  health:
+    ping:
+      enabled: true
+
+
+
